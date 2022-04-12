@@ -1,10 +1,10 @@
 package menus;
 
 import main.Screen;
+import main.SetToday;
 import menuController.ConstantFlags;
 import menuController.Menu;
 import menuController.NavigationData;
-import objects.SetToday;
 
 public class MainMenu extends Menu{
 	

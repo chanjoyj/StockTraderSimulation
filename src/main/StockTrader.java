@@ -6,41 +6,16 @@ import java.util.Scanner;
 import com.example.services.ScriptManager;
 //Main runner
 public class StockTrader {
-	private static Scanner input = new Scanner(System.in);
-	File stockData = new File("stock-meta.csv");
-	File dailyPrice = new File("daily-price.csv");
-	File performance = new File("performance.csv");
-	File tradeRecord = new File("trade-record.csv");
-	File sharesHolding= new File("shares-holding.csv");
 	
-	private Screen script = new Screen();
-
-	public static void main(String[] args) {
-		
-	}
-
-	public void dateInsertion() {
-		// TODO insert date and check if valid
-		System.out.println("Enter a date as today (DD/MM/YYYY): ");
-		String date = input.nextLine();
-		// check in DD/MM/YYYY format
-		// split check lengths and if DD<30,MM<13
-		// within date range of daily price data file dailyPrice
-		// use and from year
-		// no earlier than the date of the last trade record
-		// use and from year
-		// check if date is in daily price data file if not move to next trade date
-
-	}
+	
+	
+	
+	
+	
+	
+	
 
 	public void printMainMenu() {
-		System.out.println("Hello! Today is " + date); //TODO date
-		System.out.println("1. My records\n"
-				+ "2. Enquire a stock\n"
-				+ "3. Trade\n"
-				+ "4. Perform auto trade 5. Pass\n"
-				+ "6. Exit\n");
-		
 		//Check input
 		boolean valid;
 		do {
@@ -59,33 +34,6 @@ public class StockTrader {
 
 		} while (!valid);
 		
-		//TODO menu selection
-		switch (select) {
-		case 1: {
-			//my records
-			
-		}
-		case 2: {
-			// enquire a stock
-			
-		}
-		case 3: {
-			//trade
-			
-		}
-		case 4: {
-			//perform auto trade
-			
-		}
-		case 5: {
-			//pass
-			
-		}
-		case 6: {
-			//exit
-			System.exit(0);
-		}
-		}
 	}
 
 	public void myRecords1() {

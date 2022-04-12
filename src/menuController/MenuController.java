@@ -1,6 +1,7 @@
 package menuController;
 import java.util.Scanner;
 
+import main.Screen;
 import menus.MainMenu;
 import menus.MenuEnquireStock;
 import menus.MenuMyRecords;
@@ -8,8 +9,7 @@ import menus.MenuTrade;
 
 public class MenuController {
 	private static Menu currMenu;
-	static Scanner keyboard = new Scanner(System.in);
-	
+		
 	public static void startMenu() {
 		currMenu = new MainMenu();
 		askMenuOption();
@@ -18,10 +18,45 @@ public class MenuController {
 		NavigationData data= null;
 		do {
 			currMenu.printMenu();
-			//todo run menu rather than straight to print
-			System.out.println("Select an option:");
+			//TODO run menu rather than straight to print	
+			int options = currMenu.getNumOptions();
+			Screen.printSelectOption();
+			 //TODO make this in all menus
+			
+			boolean valid;
+			do {
+				try {
+					valid = true;
+					System.out.println("Select an option: ");
+					int select = input.nextInt();
+					if (select>options) {
+						valid = false;
+						Screen.printInvalidMainMenuOption();
+					}
+				} catch (Exception e) {
+					valid = false;
+					Screen.printInvalidMainMenuOption();
+				}
+
+			} while (!valid);
+			
+			
+
+			try {
+				int optionIndex= Integer.parseInt(Screen.keyboard.nextLine());
+				
+			} catch (Exception e) {
+				// TODO: handle exception
+				
+				
+			}
+			
+			//
+			
+			//
+			
+			
 			//select to next menu is here
-			int optionIndex= Integer.parseInt(keyboard.nextLine());
 			data = currMenu.performAction(optionIndex);
 			if (data != null) {
 				navigate(data);
