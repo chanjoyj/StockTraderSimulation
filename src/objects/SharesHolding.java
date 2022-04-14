@@ -6,6 +6,23 @@ public class SharesHolding {
 	private double averagePrice;
 	private double totalProfit;
 	
+	public SharesHolding(String stockID, int numShares, double averagePrice, double totalProfit) {
+		this.stockID = stockID;
+		this.numShares = numShares;
+		this.averagePrice = averagePrice;
+		this.totalProfit = totalProfit;
+	}
+	
+	public SharesHolding() {
+	}
+	
+	public void updateSharesHolding(String stockID, int numShares, double averagePrice, double totalProfit) {
+		this.stockID = stockID;
+		this.numShares = numShares;
+		this.averagePrice = averagePrice;
+		this.totalProfit = totalProfit;
+	}
+
 	public String getStockID() {
 		return stockID;
 	}

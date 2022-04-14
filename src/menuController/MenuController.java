@@ -17,46 +17,11 @@ public class MenuController {
 	private static void askMenuOption() {
 		NavigationData data= null;
 		do {
-			currMenu.printMenu();
-			//TODO run menu rather than straight to print	
-			int options = currMenu.getNumOptions();
-			Screen.printSelectOption();
-			 //TODO make this in all menus
-			
-			boolean valid;
-			do {
-				try {
-					valid = true;
-					System.out.println("Select an option: ");
-					int select = input.nextInt();
-					if (select>options) {
-						valid = false;
-						Screen.printInvalidMainMenuOption();
-					}
-				} catch (Exception e) {
-					valid = false;
-					Screen.printInvalidMainMenuOption();
-				}
-
-			} while (!valid);
-			
-			
-
-			try {
-				int optionIndex= Integer.parseInt(Screen.keyboard.nextLine());
-				
-			} catch (Exception e) {
-				// TODO: handle exception
-				
-				
-			}
-			
-			//
-			
-			//
-			
-			
-			//select to next menu is here
+			//print the menu
+			currMenu.printMenu();//runs the menu
+			//get menu selections
+			int optionIndex=currMenu.getSelection();
+			//run the next menu
 			data = currMenu.performAction(optionIndex);
 			if (data != null) {
 				navigate(data);
@@ -85,13 +50,15 @@ public class MenuController {
 				break;
 			}
 			case ConstantFlags.NAV_ENQUIRE: {
-				Menu Enquire = new MenuEnquireStock();
+				Menu Enquire = new MenuEnquireStock(nd.getStockID());
 				Enquire.setParentMenu(currMenu);
 				currMenu= Enquire;
 				break;
 			}
 			case ConstantFlags.NAV_TRADE: {
-				Menu trade = new MenuTrade();
+				Menu trade;
+				if (nd.getStockID()==null) trade = new MenuTrade();
+				else trade = new MenuTrade(nd.getStockID());
 				trade.setParentMenu(currMenu);
 				currMenu= trade;
 				break;

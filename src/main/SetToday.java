@@ -3,11 +3,11 @@ package main;
 public class SetToday {
 	public static String today;
 	public static String lastTradeDate= "";
-	
+	// Change date to integer, then add a method of return to string dd/mm/yyyy
 	public void inputDate() {
 		boolean valid=true;
 		String date;
-		//TODO: get date from input and check and set the date
+		//TODO: ADD a checking of index of / to see if it has a / in it for validation
 		do {
 			Screen.printDateInsertion();
 			date = Screen.keyboard.nextLine();
@@ -35,7 +35,7 @@ public class SetToday {
 	
 	public boolean checkValidDate(String date) {
 		String[] dateArr;
-			if (date.length()== 10) {
+			if (date.length()== 10) {//TODO: ADD a checking of index of / to see if it has a / in it for validation
 				dateArr= date.split("/");
 			} else return false;
 
@@ -50,7 +50,7 @@ public class SetToday {
 			}else return true;
 	}
 	
-	public static String incrementDate(String date) {
+	public static String incrementDate(String date) {//TODO also check for dividends and update the other trader menus accordingly
 		for (int i = 0; i < StockData.getPriceList().length; i++) {
 			if (StockData.getPriceList()[i].getDate() > date){ //assuming dates are in ascending order
 				date= StockData.getPriceList()[i].getDate();
@@ -62,6 +62,10 @@ public class SetToday {
 
 	public static String getDate() {
 		return today;
+	}
+	
+	public static void setDate(String today) {
+		SetToday.today= today;
 	}
 	
 	public static String changeDate(String date) {

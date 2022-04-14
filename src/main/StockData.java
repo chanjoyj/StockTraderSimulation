@@ -15,6 +15,7 @@ public class StockData {
 		private static DailyPrice[] priceList;
 		private static String dateStart;
 		private static String dateEnd;
+		
 
 		public static String getDateEnd() {
 			return dateEnd;
@@ -36,7 +37,15 @@ public class StockData {
 			return priceList;
 		}
 		
-		//assumes all 3 files exist
+		public static Stock[] getStockList() {
+			return stockList;
+		}
+
+		public static StockPerformance[] getPerformanceList() {
+			return performanceList;
+		}
+
+	//assumes all 3 files exist
 	public static void loadData() throws FileNotFoundException {
 		File stockData = new File ("stock-meta");
 		File dailyPrice = new File("daily-price.csv");
@@ -141,7 +150,7 @@ public class StockData {
 		return null;
 	}
 	
-	public static StockPerformance findPerformance(String ID,String date) {
+	public static StockPerformance findPerformance(String ID,String date) {//TODO Get latest date rather than equals
 		for (int i = 0; i < performanceList.length; i++) {
 			if (ID.equals(performanceList[i].getStockID()) && date.equals(performanceList[i].getDate())){
 				return performanceList[i];

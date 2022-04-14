@@ -12,5 +12,7 @@ public abstract class Menu {
 	}
 	public abstract void printMenu();
 	
+	public abstract int getSelection();
+	
 	public abstract NavigationData performAction(int optionIndex);
 }

@@ -15,6 +15,9 @@ public class TradeRecord {
 		this.direction = direction;
 	}
 
+	public TradeRecord() {
+	}
+
 	public String getDate() {
 		return date;
 	}

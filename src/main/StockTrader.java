@@ -6,14 +6,6 @@ import java.util.Scanner;
 import com.example.services.ScriptManager;
 //Main runner
 public class StockTrader {
-	
-	
-	
-	
-	
-	
-	
-	
 
 	public void printMainMenu() {
 		//Check input

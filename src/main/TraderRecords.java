@@ -8,11 +8,13 @@ import java.util.Scanner;
 import objects.DailyPrice;
 import objects.SharesHolding;
 import objects.TradeRecord;
-
+//TODO FIND THE TO STRING METHOD DO AN INTEGER+"" EMPTY STRING TO BECOME A STRING
 public class TraderRecords {
 	private static TradeRecord[] tradeList;
 	private static SharesHolding[] holdingList;
-	
+	private static Double cash;
+	private static Double overallProfit;
+
 	public static void loadRecords() throws FileNotFoundException {
 		File tradeRecord = new File("trade-record.csv");
 		File sharesHolding= new File("shares-holding.csv");
@@ -34,6 +36,9 @@ public class TraderRecords {
 			}
 			loadHoldingData(tradeRecord);
 		}
+		
+		setOverallProfit();
+		setCash();
 	}
 
 	private static void loadTradeData(File Data) throws FileNotFoundException {
@@ -67,9 +72,60 @@ public class TraderRecords {
 		FileReader.close();
 	}
 	
+	public static Double getCash() {
+		return cash;
+	}
+
+	public static void setCash() {//TODO DIVIDENDS
+		double cash= 1000000.00;
+		if (tradeList.length>0) {
+			for (int i = 0; i < tradeList.length; i++) {
+				if (tradeList[i].getDirection() ==1)
+				{
+					cash= cash- tradeList[i].getPrice();
+				}else if (tradeList[i].getDirection() ==2) {
+					cash= cash+ tradeList[i].getPrice();
+				}
+			}
+			for (int i = 0; i < holdingList.length; i++) {
+				cash= cash + holdingList[i].getTotalProfit();
+			}
+		}
+		TraderRecords.cash= cash;
+	}
+
+	public static Double getOverallProfit() {
+		return overallProfit;
+	}
+	
+	public static void setOverallProfit() {//TODO DIVIDENDS
+		Double profit=0.0;
+		for (int i = 0; i < holdingList.length; i++) {
+			profit= profit + holdingList[i].getTotalProfit();
+		}
+		TraderRecords.overallProfit= profit;
+	}
+	
+	public static TradeRecord[] getTradeList() {
+		return tradeList;
+	}
+
+	public static SharesHolding[] getHoldingList() {
+		return holdingList;
+	}
+	
 	public static TradeRecord findTradeRecord(String ID,String date) {
 		for (int i = 0; i < tradeList.length; i++) {
 			if (ID.equals(tradeList[i].getStockID()) && date.equals(tradeList[i].getDate())){
+				return tradeList[i];
+			}
+		}
+		return null;
+	}
+	
+	public static TradeRecord findLastTradeRecord(String ID) {//TODO see if this works without day list
+		for (int i = tradeList.length-1; i<0; i--) {
+			if (ID.equals(tradeList[i].getStockID())){
 				return tradeList[i];
 			}
 		}
@@ -108,6 +164,19 @@ public class TraderRecords {
 						String.valueOf(record.getTotalProfit()) + ",");		
 		outputFile.close();
 		loadRecords();	//resets the array holdingList
+	}
+	
+	public static void updateSharesHolding() throws IOException {
+		File sharesHolding= new File("shares-holding.csv");
+		FileWriter outputFile = new FileWriter(sharesHolding,false);
+		for (int i = 0; i < holdingList.length; i++) {
+			outputFile.write(holdingList[i].getStockID() + ","+
+					String.valueOf(holdingList[i].getNumShares()) + ","+
+					String.valueOf(holdingList[i].getAveragePrice()) + ","+
+					String.valueOf(holdingList[i].getTotalProfit()) + ",");	
+		}
+		outputFile.close();
+		loadRecords();//TODO SEE IF NEED
 	}
 	
 }
