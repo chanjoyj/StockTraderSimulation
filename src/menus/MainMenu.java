@@ -1,5 +1,7 @@
 package menus;
 
+import java.io.IOException;
+
 import main.Screen;
 import main.SetToday;
 import main.StockData;
@@ -8,13 +10,15 @@ import menuController.ConstantFlags;
 import menuController.Menu;
 import menuController.NavigationData;
 import objects.DailyPrice;
+import objects.SharesHolding;
 import objects.Stock;
+import objects.TradeRecord;
 
 public class MainMenu extends Menu{
 	
 	public void printMenu() {
-		String today= SetToday.getDate();
-		Screen.printMainMenu(today);
+		int today= SetToday.getDate();
+		Screen.printMainMenu(SetToday.revertDate(today));
 	}
 	
 	public int getSelection() {
@@ -72,7 +76,8 @@ public class MainMenu extends Menu{
 				return new NavigationData(ConstantFlags.NAV_MAIN);
 			}
 			case 5:{
-				pass();
+				int newDate = SetToday.incrementDate(SetToday.getDate());
+				SetToday.setDate(newDate);
 				return new NavigationData(ConstantFlags.NAV_MAIN);
 			}
 			case 6:{
@@ -83,32 +88,88 @@ public class MainMenu extends Menu{
 	}
 	
 	private void autoTrade() {
-		//TODO Auto trade T8
-		String endDate;
+		int endDate;
 		do {
 			Screen.printEndDatePrompt();
-			endDate = Screen.keyboard.nextLine();
-			endDate= SetToday.changeDate(endDate);
+			String end = Screen.keyboard.nextLine();
+			endDate= SetToday.changeDate(end);
+			if (endDate<SetToday.getDate()) {
+				Screen.printInvalidAutoTradeEndDatePrompt();
+			}
 		} while (endDate<SetToday.getDate());
 		String stockID = "00700";
 		
-		//TODO add a for each date in records from today to end date:
-		String[] dateList;
-		for (int i = 0; i < array.length; i++) {
-			dateList[i];
-			DailyPrice dailyPrice = StockData.findDailyPrice(stockID, date);
+		//TODO call a datelist sorted from today to date before end date:
+		int[] dateList = new int[3];
+		for (int i = 0; i < dateList.length; i++) {
+			SetToday.setDate(dateList[i]);
+			DailyPrice dailyPrice = StockData.findDailyPrice(stockID, SetToday.getDate());
 			TradeRecord lastTrade = TraderRecords.findLastTradeRecord(stockID);
-			if (condition) {
-				//TODO 
+			SharesHolding stockShares=TraderRecords.findSharesHolding(stockID);
+			if (!(lastTrade==null)) {
+				if (dailyPrice.getClose()<lastTrade.getPrice()&&!(stockShares==null)) {
+					sellTrade(stockShares.getNumShares(),stockShares,dailyPrice.getClose());
+					Screen.printAutoTradeMsg(SetToday.revertDate(SetToday.getDate()), stockID, 2, dailyPrice.getClose(), stockShares.getNumShares(), dailyPrice.getClose()*stockShares.getNumShares());
+					
+				}else if (dailyPrice.getClose()<lastTrade.getPrice()&& TraderRecords.getCash()>dailyPrice.getClose()) {
+					double numPossible= TraderRecords.getCash()/dailyPrice.getClose();
+					int max= Integer.parseInt((""+numPossible).substring(0,(""+numPossible).indexOf(".")));	
+					buyTrade(max, dailyPrice.getClose());
+					Screen.printAutoTradeMsg(SetToday.revertDate(SetToday.getDate()), stockID, 1, dailyPrice.getClose(), max, dailyPrice.getClose()*max);
+				}
 			}
 		}
-		
+		SetToday.setDate(endDate);
 	}
 	
-	private void pass() {
-		//increments the date
-		String today= SetToday.getDate();
-		String date = SetToday.incrementDate(today);
-		SetToday.setDate(date);
+	private void sellTrade(int amountsell, SharesHolding stockShares, double stockPrice) {
+		//shares holding
+		String stockID = "00700";
+		//TODO CHECK how average price and profit are calculated
+		stockShares.updateSharesHolding(stockID, stockShares.getNumShares()-amountsell, stockShares.getAveragePrice(), stockShares.getTotalProfit()+((amountsell-stockShares.getAveragePrice())*stockPrice));
+		try {
+			TraderRecords.updateSharesHolding();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		}
+		
+		//TradeRecord
+		TradeRecord buyTradeRecord = new TradeRecord(SetToday.getDate(), stockID, stockPrice, amountsell, 2);
+		try {
+			TraderRecords.addTradeRecord(buyTradeRecord);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	private void buyTrade(int amountbuy, Double stockPrice) {
+		String stockID = "00700";
+		//shares holding
+		// get the shares holding if have and update it
+		SharesHolding existingSharesHolding =TraderRecords.findSharesHolding(stockID);
+		if (existingSharesHolding==null) {//if no create new and add 
+			SharesHolding newSharesHolding = new SharesHolding(stockID, amountbuy, stockPrice, 0);
+			try {
+				TraderRecords.addSharesHolding(newSharesHolding);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+			}
+		}else {
+			existingSharesHolding.updateSharesHolding(stockID, existingSharesHolding.getNumShares()+amountbuy, (existingSharesHolding.getAveragePrice()+stockPrice)/2, existingSharesHolding.getTotalProfit());
+			try {
+				TraderRecords.updateSharesHolding();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+			}
+		}
+		//trade record
+		// make a new trade record and add into file and reset array
+		TradeRecord buyTradeRecord = new TradeRecord(SetToday.getDate(), stockID, stockPrice, amountbuy, 1);
+		try {
+			TraderRecords.addTradeRecord(buyTradeRecord);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+		}
 	}
 }

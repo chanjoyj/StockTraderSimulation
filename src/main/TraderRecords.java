@@ -5,38 +5,47 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Scanner;
 
-import objects.DailyPrice;
 import objects.SharesHolding;
 import objects.TradeRecord;
-//TODO FIND THE TO STRING METHOD DO AN INTEGER+"" EMPTY STRING TO BECOME A STRING
+
 public class TraderRecords {
 	private static TradeRecord[] tradeList;
 	private static SharesHolding[] holdingList;
 	private static Double cash;
 	private static Double overallProfit;
 
-	public static void loadRecords() throws FileNotFoundException {
+	public static void loadRecords() {//TODO check for File not found 
 		File tradeRecord = new File("trade-record.csv");
 		File sharesHolding= new File("shares-holding.csv");
 		
 		if (tradeRecord.exists()) {
-			int numTrades= StockData.countrecords(tradeRecord);
-			tradeList = new TradeRecord[numTrades];
-			for (int i = 0; i < numTrades; i++) {
-				tradeList[i]= new TradeRecord();
+			int numTrades;
+			try {
+				numTrades = StockData.countrecords(tradeRecord);
+				tradeList = new TradeRecord[numTrades];
+				for (int i = 0; i < numTrades; i++) {
+					tradeList[i]= new TradeRecord();
+				}
+				loadTradeData(tradeRecord);
+			} catch (FileNotFoundException e) {
+				//TODO Auto-generated catch block for if file is not found
 			}
-			loadTradeData(tradeRecord);
 		}
 		
 		if (sharesHolding.exists()) {
-			int numHolding= StockData.countrecords(tradeRecord);
-			holdingList = new SharesHolding[numHolding];
-			for (int i = 0; i < numHolding; i++) {
-				holdingList[i]= new SharesHolding();
+			int numHolding;
+			try {
+				numHolding = StockData.countrecords(sharesHolding);
+				holdingList = new SharesHolding[numHolding];
+				for (int i = 0; i < numHolding; i++) {
+					holdingList[i]= new SharesHolding();
+				}
+				loadHoldingData(tradeRecord);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block for if file is not found
 			}
-			loadHoldingData(tradeRecord);
 		}
-		
+		//add dividends
 		setOverallProfit();
 		setCash();
 	}
@@ -47,7 +56,7 @@ public class TraderRecords {
 		while (FileReader.hasNext()){
 			String line = FileReader.nextLine();
 			String[] Arr= line.split(",");
-			tradeList[index].setDate(Arr[0]);
+			tradeList[index].setDate(SetToday.changeDate(Arr[0]));
 			tradeList[index].setStockID(Arr[1]);
 			tradeList[index].setPrice(Double.parseDouble(Arr[2]));
 			tradeList[index].setNumShares(Integer.parseInt(Arr[3]));
@@ -57,7 +66,7 @@ public class TraderRecords {
 		FileReader.close();
 	}
 	
-	private static void loadHoldingData(File Data) throws FileNotFoundException {
+	private static void loadHoldingData(File Data) throws FileNotFoundException{
 		Scanner FileReader = new Scanner(Data);
 		int index = 0;
 		while (FileReader.hasNext()){
@@ -78,7 +87,7 @@ public class TraderRecords {
 
 	public static void setCash() {//TODO DIVIDENDS
 		double cash= 1000000.00;
-		if (tradeList.length>0) {
+		if (!(tradeList==null)) {
 			for (int i = 0; i < tradeList.length; i++) {
 				if (tradeList[i].getDirection() ==1)
 				{
@@ -100,8 +109,10 @@ public class TraderRecords {
 	
 	public static void setOverallProfit() {//TODO DIVIDENDS
 		Double profit=0.0;
-		for (int i = 0; i < holdingList.length; i++) {
-			profit= profit + holdingList[i].getTotalProfit();
+		if (!(holdingList==null)) {
+			for (int i = 0; i < holdingList.length; i++) {
+				profit= profit + holdingList[i].getTotalProfit();
+			}
 		}
 		TraderRecords.overallProfit= profit;
 	}
@@ -114,9 +125,9 @@ public class TraderRecords {
 		return holdingList;
 	}
 	
-	public static TradeRecord findTradeRecord(String ID,String date) {
+	public static TradeRecord findTradeRecord(String ID,int date) {
 		for (int i = 0; i < tradeList.length; i++) {
-			if (ID.equals(tradeList[i].getStockID()) && date.equals(tradeList[i].getDate())){
+			if (ID.equals(tradeList[i].getStockID()) && date==tradeList[i].getDate()){
 				return tradeList[i];
 			}
 		}
@@ -141,27 +152,25 @@ public class TraderRecords {
 		return null;
 	}
 	
-	public static void addTradeRecord(TradeRecord record) throws IOException{
-		//TODO add a trade record to the tradeList. and writes it into the csv file
+	public static void addTradeRecord(TradeRecord record) throws IOException{//TODO do we need to deal with this exception?
 		File tradeRecord = new File("trade-record.csv");
-		FileWriter outputFile = new FileWriter(tradeRecord,true);
-		outputFile.write(record.getDate() + ","+
+		FileWriter outputFile = new FileWriter(tradeRecord,true);//appends
+		outputFile.write(SetToday.revertDate(record.getDate()) + ","+
 						record.getStockID() + ","+
-						String.valueOf(record.getPrice()) + ","+
-						String.valueOf(record.getNumShares()) + ","+
-						String.valueOf(record.getDirection()) + ",");		
+						record.getPrice()+
+						record.getNumShares() + ","+
+						record.getDirection() + ",");		
 		outputFile.close();
 		loadRecords();	//resets the array tradeList
 	}
 	
 	public static void addSharesHolding(SharesHolding record) throws IOException{
-		//TODO add a shares holding record to the holdingList. and writes it into the csv file
 		File sharesHolding= new File("shares-holding.csv");
-		FileWriter outputFile = new FileWriter(sharesHolding,true);
+		FileWriter outputFile = new FileWriter(sharesHolding,true);//appends
 		outputFile.write(record.getStockID() + ","+
-						String.valueOf(record.getNumShares()) + ","+
-						String.valueOf(record.getAveragePrice()) + ","+
-						String.valueOf(record.getTotalProfit()) + ",");		
+						record.getNumShares() + ","+
+						record.getAveragePrice() + ","+
+						record.getTotalProfit() + ",");		
 		outputFile.close();
 		loadRecords();	//resets the array holdingList
 	}
@@ -171,9 +180,9 @@ public class TraderRecords {
 		FileWriter outputFile = new FileWriter(sharesHolding,false);
 		for (int i = 0; i < holdingList.length; i++) {
 			outputFile.write(holdingList[i].getStockID() + ","+
-					String.valueOf(holdingList[i].getNumShares()) + ","+
-					String.valueOf(holdingList[i].getAveragePrice()) + ","+
-					String.valueOf(holdingList[i].getTotalProfit()) + ",");	
+					holdingList[i].getNumShares() + ","+
+					holdingList[i].getAveragePrice() + ","+
+					holdingList[i].getTotalProfit() + ",");	
 		}
 		outputFile.close();
 		loadRecords();//TODO SEE IF NEED

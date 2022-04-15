@@ -1,13 +1,13 @@
 package objects;
 
 public class TradeRecord {
-	private String date;
+	private int date;
 	private String stockID;
 	private double price;
 	private int numShares;
 	private int direction;
 
-	public TradeRecord(String date, String stockID, double price, int numShares, int direction) {
+	public TradeRecord(int date, String stockID, double price, int numShares, int direction) {
 		this.date = date;
 		this.stockID = stockID;
 		this.price = price;
@@ -18,11 +18,11 @@ public class TradeRecord {
 	public TradeRecord() {
 	}
 
-	public String getDate() {
+	public int getDate() {
 		return date;
 	}
 
-	public void setDate(String date) {
+	public void setDate(int date) {
 		this.date = date;
 	}
 

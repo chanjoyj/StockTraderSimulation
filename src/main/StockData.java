@@ -6,30 +6,29 @@ import java.util.Scanner;
 import objects.DailyPrice;
 import objects.Stock;
 import objects.StockPerformance;
-import objects.TradeRecord;
 //holds the stock data information as an array
 //array of stock information
 public class StockData {
 		private static Stock[] stockList;
 		private static StockPerformance[] performanceList;
 		private static DailyPrice[] priceList;
-		private static String dateStart;
-		private static String dateEnd;
+		private static int dateStart;
+		private static int dateEnd;
 		
 
-		public static String getDateEnd() {
+		public static int getDateEnd() {
 			return dateEnd;
 		}
 
-		public static void setDateEnd(String dateEnd) {
+		public static void setDateEnd(int dateEnd) {
 			StockData.dateEnd = dateEnd;
 		}
 		
-		public static String getDateStart() {
+		public static int getDateStart() {
 			return dateStart;
 		}
 
-		public static void setDateStart(String dateStart) {
+		public static void setDateStart(int dateStart) {
 			StockData.dateStart = dateStart;
 		}
 		
@@ -47,7 +46,7 @@ public class StockData {
 
 	//assumes all 3 files exist
 	public static void loadData() throws FileNotFoundException {
-		File stockData = new File ("stock-meta");
+		File stockData = new File ("stock-meta.csv");
 		File dailyPrice = new File("daily-price.csv");
 		File stockPerformance = new File("performance.csv");
 		
@@ -71,12 +70,7 @@ public class StockData {
 			performanceList[i]= new StockPerformance();
 		}
 		loadPerformanceeData(stockPerformance);
-		
-		
-		
-		
-		//TODO change all dates to yyyy/mm/dd
-		//set the max and min dates
+		//TODO get a list of all valid dates with the max and min dates, dateStart and dateEnd
 	}
 	
 	public static int countrecords(File Data) throws FileNotFoundException {
@@ -150,18 +144,18 @@ public class StockData {
 		return null;
 	}
 	
-	public static StockPerformance findPerformance(String ID,String date) {//TODO Get latest date rather than equals
-		for (int i = 0; i < performanceList.length; i++) {
-			if (ID.equals(performanceList[i].getStockID()) && date.equals(performanceList[i].getDate())){
+	public static StockPerformance findPerformance(String ID,int date) {
+		for (int i =0; i < performanceList.length; i++) {
+			if (ID.equals(performanceList[i].getStockID()) && date>performanceList[i].getDate()){
 				return performanceList[i];
 			}
 		}
 		return null;
 	}
 	
-	public static DailyPrice findDailyPrice(String ID,String date) {
+	public static DailyPrice findDailyPrice(String ID,int date) {
 		for (int i = 0; i < priceList.length; i++) {
-			if (ID.equals(priceList[i].getStockID()) && date.equals(priceList[i].getDate())){
+			if (ID.equals(priceList[i].getStockID()) && date==priceList[i].getDate()){
 				return priceList[i];
 			}
 		}

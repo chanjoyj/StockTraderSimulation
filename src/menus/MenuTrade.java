@@ -12,7 +12,6 @@ import menuController.NavigationData;
 import objects.DailyPrice;
 import objects.SharesHolding;
 import objects.Stock;
-import objects.StockPerformance;
 import objects.TradeRecord;
 
 public class MenuTrade extends Menu {

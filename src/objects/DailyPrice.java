@@ -2,7 +2,7 @@ package objects;
 
 public class DailyPrice {
 	private String stockID;
-	private String date;
+	private int date;
 	private double close;
 	
 	public String getStockID() {
@@ -11,10 +11,10 @@ public class DailyPrice {
 	public void setStockID(String stockID) {
 		this.stockID = stockID;
 	}
-	public String getDate() {
+	public int getDate() {
 		return date;
 	}
-	public void setDate(String date) {
+	public void setDate(int date) {
 		this.date = date;
 	}
 	public double getClose() {

@@ -3,15 +3,12 @@ package menus;
 import main.Screen;
 import main.SetToday;
 import main.StockData;
-import main.TraderRecords;
 import menuController.ConstantFlags;
 import menuController.Menu;
 import menuController.NavigationData;
 import objects.DailyPrice;
-import objects.SharesHolding;
 import objects.Stock;
 import objects.StockPerformance;
-import objects.TradeRecord;
 
 public class MenuEnquireStock extends Menu{
 	private String stockID;
@@ -57,21 +54,19 @@ public class MenuEnquireStock extends Menu{
 			}
 		
 		}else if (optionIndex==stock.getETFstocks().length+1) {
-			//TODO initialize trade here
-			return new NavigationData(ConstantFlags.NAV_TRADE);
+			return new NavigationData(ConstantFlags.NAV_TRADE,stock.getStockID());
 			
 		}else if (optionIndex==stock.getETFstocks().length+2) {
-			//Enquire price within date range
-			String startDate;
-			String endDate;
+			int startDate;
+			int endDate;
 			do {
 				Screen.printStartDatePrompt();
-				startDate = Screen.keyboard.nextLine();
-				startDate= SetToday.changeDate(startDate);
+				String start = Screen.keyboard.nextLine();
+				startDate= SetToday.changeDate(start);
 				
 				Screen.printEndDatePrompt();
-				endDate = Screen.keyboard.nextLine();
-				endDate= SetToday.changeDate(endDate);
+				String end = Screen.keyboard.nextLine();
+				endDate= SetToday.changeDate(end);
 				
 				if (endDate<startDate) {
 					Screen.printInvalidDatePrompt();
@@ -89,12 +84,12 @@ public class MenuEnquireStock extends Menu{
 		return null;
 	}
 	
-	private void printRecords(String startDate, String endDate) {
+	private void printRecords(int startDate, int endDate) {
 		DailyPrice[] priceList= StockData.getPriceList();
 		int count=0;
 		for (int i =0; i <priceList.length; i++) {
-			if (getStockID().equals(priceList[i].getStockID()) && priceList[i].getDate()<=endDate && priceList[i].getDate()=>startDate && priceList[i].getDate()<=SetToday.getDate()) {
-				Screen.printPrice(priceList[i].getDate(),priceList[i].getClose());
+			if (getStockID().equals(priceList[i].getStockID()) && priceList[i].getDate()<=endDate && priceList[i].getDate()>=startDate && priceList[i].getDate()<=SetToday.getDate()) {
+				Screen.printPrice(SetToday.revertDate(priceList[i].getDate()),priceList[i].getClose());
 				count++;
 			}
 		}

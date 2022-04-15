@@ -2,20 +2,23 @@ package objects;
 
 public class StockPerformance {
 	private String stockID;
-	private String date;
+	private int date;
 	private double profit;
 	private double NAV;
 	private double dividend;
-	private String payableDate;
+	private int payableDate;
 
-	public StockPerformance(String stockID, String date, double profit, double nAV, double dividend,
-			String payableDate) {
+	public StockPerformance(String stockID, int date, double profit, double nAV, double dividend,
+			int payableDate) {
 		this.stockID = stockID;
 		this.date = date;
 		this.profit = profit;
 		this.NAV = nAV;
 		this.dividend = dividend;
 		this.payableDate = payableDate;
+	}
+
+	public StockPerformance() {
 	}
 
 	public String getStockID() {
@@ -26,11 +29,11 @@ public class StockPerformance {
 		this.stockID = stockID;
 	}
 
-	public String getDate() {
+	public int getDate() {
 		return date;
 	}
 
-	public void setDate(String date) {
+	public void setDate(int date) {
 		this.date = date;
 	}
 
@@ -58,11 +61,11 @@ public class StockPerformance {
 		this.dividend = dividend;
 	}
 
-	public String getPayableDate() {
+	public int getPayableDate() {
 		return payableDate;
 	}
 
-	public void setPayableDate(String payableDate) {
+	public void setPayableDate(int payableDate) {
 		this.payableDate = payableDate;
 	}
 

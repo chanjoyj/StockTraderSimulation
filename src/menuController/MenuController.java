@@ -1,7 +1,5 @@
 package menuController;
-import java.util.Scanner;
 
-import main.Screen;
 import menus.MainMenu;
 import menus.MenuEnquireStock;
 import menus.MenuMyRecords;

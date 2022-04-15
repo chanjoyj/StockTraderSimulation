@@ -14,14 +14,15 @@ public class MenuMyRecords extends Menu{
 		Double accCash = TraderRecords.getCash();
 		Double overallProfit =TraderRecords.getOverallProfit();
 		Screen.printAccInfo(accCash,overallProfit);
-		
+		int optionNum;
 		SharesHolding[] holdingList= TraderRecords.getHoldingList();
-		for (int i = holdingList.length-1; i <0; i--) {
-			Screen.printShareHoldingOption(holdingList.length-i, holdingList[i].getStockID(),holdingList[i].getNumShares(),holdingList[i].getAveragePrice(),holdingList[i].getTotalProfit());
-			
-		}		
-		int optionNum = holdingList.length;//number of options in stocks
-	
+		if (!(holdingList==null)) {
+			for (int i = holdingList.length-1; i <0; i--) {
+				Screen.printShareHoldingOption(holdingList.length-i, holdingList[i].getStockID(),holdingList[i].getNumShares(),holdingList[i].getAveragePrice(),holdingList[i].getTotalProfit());
+				
+			}		
+			optionNum = holdingList.length;//number of options in stocks
+		}else optionNum= 0;
 	Screen.printEnquiryTradingRecordsInPeriodOption(optionNum+1);
 	Screen.printBackOption(optionNum+2);
 	}
@@ -34,88 +35,120 @@ public class MenuMyRecords extends Menu{
 	
 	public NavigationData performAction(int optionIndex) {
 		SharesHolding[] holdingList= TraderRecords.getHoldingList();
+		int option;
 		//shares menu
-		for (int i = holdingList.length-1; i <0; i--) {
-			if (optionIndex==holdingList.length-i) {
-				tradeRecords(holdingList[i].getStockID());
-				
-				//print
-				Screen.printOrderMenu();
-				String selection= Screen.keyboard.nextLine();
-				switch (selection) {//TODO Sorting
-				case "1": {
+		if (!(holdingList==null)) {
+			for (int i = holdingList.length-1; i <0; i--) {
+				if (optionIndex==holdingList.length-i) {
 					tradeRecords(holdingList[i].getStockID());
-				}case "2": {
-					//Order by trade price
-				}case "3": {
-					//Order by trade shares
-				}case "4": {
-					//Order by total trade amount
-				}case "5": {
-					//Order by stock ID
-				}case "6": {//back
-					return new NavigationData(ConstantFlags.NAV_MYRECORDS);
+					
+					//print
+					Screen.printOrderMenu();
+					String selection= Screen.keyboard.nextLine();
+					switch (selection) {//TODO Sorting
+					case "1": {
+						tradeRecords(holdingList[i].getStockID());
+					}case "2": {
+						//Order by trade price
+					}case "3": {
+						//Order by trade shares
+					}case "4": {
+						//Order by total trade amount
+					}case "5": {
+						//Order by stock ID
+					}case "6": {//back
+						return new NavigationData(ConstantFlags.NAV_MYRECORDS);
+					}
+					}				
+					break;
 				}
-				}				
-				break;
 			}
-		}
-		//other menu
-		if (optionIndex==holdingList.length+1) {
-			//TODO T4
-			String startDate;
-			String endDate;
+			option=holdingList.length;
+		}else option=0;
+		
+		if (optionIndex==option+1) {//display enquiries menu
+			int startDate;
+			int endDate;
 			do {
 				Screen.printStartDatePrompt();
-				startDate = Screen.keyboard.nextLine();
-				startDate= SetToday.changeDate(startDate);
+				String start = Screen.keyboard.nextLine();
+				startDate= SetToday.changeDate(start);
 				
 				Screen.printEndDatePrompt();
-				endDate = Screen.keyboard.nextLine();
-				endDate= SetToday.changeDate(endDate);
+				String end = Screen.keyboard.nextLine();
+				endDate= SetToday.changeDate(end);
 				
 				if (endDate<startDate) {
 					Screen.printInvalidDatePrompt();
 				}
 			} while (endDate<startDate);
-			
-			tradeRecords(startDate,endDate);
 			//print
+			tradeRecords(startDate,endDate);
 			Screen.printOrderMenu();
-			String selection= Screen.keyboard.nextLine();
-			switch (selection) {//TODO Sorting
-			case "1": {
-				tradeRecords(startDate,endDate);
-			}case "2": {
-				//Order by trade price
-			}case "3": {
-				//Order by trade shares
-			}case "4": {
-				//Order by total trade amount
-			}case "5": {
-				//Order by stock ID
-			}case "6": {//back
-				return new NavigationData(ConstantFlags.NAV_MYRECORDS);
-			}
+			Screen.printSelectOption();
+			int selection=Integer.parseInt(Screen.keyboard.nextLine());
+			do {
+				switch (selection) {//TODO Sorting
+					case 1: {//default no change
+						tradeRecords(startDate,endDate);
+						Screen.printOrderMenu();
+						Screen.printSelectOption();
+						selection= Integer.parseInt(Screen.keyboard.nextLine());
+					}case 2: {
+						//Order by trade price
+						tradeRecords(startDate,endDate);//TODO add a sorting here for all below
+						Screen.printOrderMenu();
+						Screen.printSelectOption();
+						selection= Integer.parseInt(Screen.keyboard.nextLine());
+					}case 3: {
+						//Order by trade shares
+						tradeRecords(startDate,endDate);
+						Screen.printOrderMenu();
+						Screen.printSelectOption();
+						selection= Integer.parseInt(Screen.keyboard.nextLine());
+					}case 4: {
+						//Order by total trade amount
+						tradeRecords(startDate,endDate);
+						Screen.printOrderMenu();
+						Screen.printSelectOption();
+						selection= Integer.parseInt(Screen.keyboard.nextLine());
+					}case 5: {
+						//Order by stock ID
+						tradeRecords(startDate,endDate);
+						Screen.printOrderMenu();
+						Screen.printSelectOption();
+						selection= Integer.parseInt(Screen.keyboard.nextLine());
+					}
+				}
+			} while (selection!=6);//TODO debug mode why keep running 6
+			if (selection ==6) {
+				printMenu();
+				int op = getSelection();
+				performAction(op);
 			}
 
-		}else return new NavigationData(ConstantFlags.NAV_BACK);//TODO Check if this is meant to be back or null
+		}else if (optionIndex==option+2) {
+			return new NavigationData(ConstantFlags.NAV_BACK);
+		}
+		return null;
 	}
 	
 	private void tradeRecords(String stockID) {
 		TradeRecord[] tradeRecords= TraderRecords.getTradeList();
 		for (int i = tradeRecords.length-1; i <0; i--) {
 			if (stockID.equals(tradeRecords[i].getStockID())) {
-				Screen.printTradeRecord(tradeRecords[i].getDate(),tradeRecords[i].getStockID(),tradeRecords[i].getDirection(),tradeRecords[i].getPrice(),tradeRecords[i].getNumShares(),tradeRecords[i].getPrice()*tradeRecords[i].getNumShares());
+				Screen.printTradeRecord(SetToday.revertDate(tradeRecords[i].getDate()),tradeRecords[i].getStockID(),tradeRecords[i].getDirection(),tradeRecords[i].getPrice(),tradeRecords[i].getNumShares(),tradeRecords[i].getPrice()*tradeRecords[i].getNumShares());
 			}
 		}
 	}
 	
-	private void tradeRecords(String startDate, String endDate) {
+	private void tradeRecords(int startDate, int endDate) {
 		TradeRecord[] tradeRecords= TraderRecords.getTradeList();
-		for (int i = tradeRecords.length-1; i <0; i--) {
-			if (tradeRecords[i].getDate()<endDate && tradeRecords[i].getDate()>startDate) {
-				Screen.printTradeRecord(tradeRecords[i].getDate(),tradeRecords[i].getStockID(),tradeRecords[i].getDirection(),tradeRecords[i].getPrice(),tradeRecords[i].getNumShares(),tradeRecords[i].getPrice()*tradeRecords[i].getNumShares());
+		if (!(tradeRecords==null)) {
+			for (int i = tradeRecords.length-1; i <0; i--) {
+				if (tradeRecords[i].getDate()<endDate && tradeRecords[i].getDate()>startDate) {
+					Screen.printTradeRecord(SetToday.revertDate(tradeRecords[i].getDate()),tradeRecords[i].getStockID(),tradeRecords[i].getDirection(),tradeRecords[i].getPrice(),tradeRecords[i].getNumShares(),tradeRecords[i].getPrice()*tradeRecords[i].getNumShares());
+				}
 			}
 		}
 	}
