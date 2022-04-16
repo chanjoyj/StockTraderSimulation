@@ -6,8 +6,9 @@ public class TradeRecord {
 	private double price;
 	private int numShares;
 	private int direction;
+	private int totalNumShares;
 
-	public TradeRecord(int date, String stockID, double price, int numShares, int direction) {
+	public TradeRecord(int date, String stockID, double price, int numShares, int direction, int totalNumShares) {
 		this.date = date;
 		this.stockID = stockID;
 		this.price = price;
@@ -56,6 +57,14 @@ public class TradeRecord {
 
 	public void setDirection(int direction) {
 		this.direction = direction;
+	}
+
+	public int getTotalNumShares() {
+		return totalNumShares;
+	}
+
+	public void setTotalNumShares(int totalNumShares) {
+		this.totalNumShares = totalNumShares;
 	}
 
 }

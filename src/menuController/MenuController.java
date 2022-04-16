@@ -1,5 +1,6 @@
 package menuController;
 
+import main.SetToday;
 import menus.MainMenu;
 import menus.MenuEnquireStock;
 import menus.MenuMyRecords;
@@ -16,6 +17,8 @@ public class MenuController {
 		NavigationData data= null;
 		do {
 			//print the menu
+			//TODO Delete later
+			System.out.println("Date check today is: "+SetToday.getDate());
 			currMenu.printMenu();//runs the menu
 			//get menu selections
 			int optionIndex=currMenu.getSelection();

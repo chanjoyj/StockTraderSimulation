@@ -70,7 +70,6 @@ public class StockData {
 			performanceList[i]= new StockPerformance();
 		}
 		loadPerformanceeData(stockPerformance);
-		//TODO get a list of all valid dates with the max and min dates, dateStart and dateEnd
 	}
 	
 	public static int countrecords(File Data) throws FileNotFoundException {
@@ -92,10 +91,11 @@ public class StockData {
 			String[] Arr= line.split(",");
 			stockList[index].setStockID(Arr[0]);
 			stockList[index].setType(Integer.parseInt(Arr[1]));
-			if (Arr[1]=="2") {
+			if (Integer.parseInt(Arr[1])==2) {
 				Stock[] ETF= new Stock[Arr.length-2];
-				for (int i = 2; i < Arr.length; i++) {
-					ETF[i-2].setStockID(Arr[i]);
+				for (int i = 0; i < Arr.length-2; i++) {
+					ETF[i]= new Stock();
+					ETF[i].setStockID(Arr[i+2]);
 				}
 				stockList[index].setETFstocks(ETF);
 			}

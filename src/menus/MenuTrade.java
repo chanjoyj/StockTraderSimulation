@@ -36,6 +36,7 @@ private String stockID;
 			}
 			if (!valid) {
 				Screen.printInvalidStockId();
+				Screen.printEnterStockId();
 				stockID = Screen.keyboard.nextLine();
 			}
 		} while (!valid);
@@ -53,14 +54,14 @@ private String stockID;
 		int optionIndex = Integer.parseInt(Screen.keyboard.nextLine());
 		return optionIndex;
 	}
-
+	//TODO check error in trade adding to the file but not into the list
 	public NavigationData performAction(int optionIndex) {
 		DailyPrice stockPrice= StockData.findDailyPrice(getStockID(),SetToday.getDate());
 		switch (optionIndex) {
 			case 1: {//buy
 				if (TraderRecords.getCash()<stockPrice.getClose()) {
 					Screen.printInsufficientCash();
-					redisplayTradeMenu();
+					return redisplayTradeMenu();
 					
 				}else {
 					double numPossible= TraderRecords.getCash()/stockPrice.getClose();
@@ -78,14 +79,14 @@ private String stockID;
 					
 					//do the buy trade
 					buyTrade(amountbuy, stockPrice.getClose());
-					redisplayTradeMenu();
+					return redisplayTradeMenu();
 				}
 			}
 			case 2: {//sell
 				SharesHolding stockShares=TraderRecords.findSharesHolding(getStockID());
-				if (stockShares==null) {
+				if (stockShares==null||stockShares.getNumShares()==0) {
 					Screen.printInsufficientShare();
-					redisplayTradeMenu();
+					return redisplayTradeMenu();
 				}else {
 					Boolean valid= true;
 					int amountsell;
@@ -99,7 +100,7 @@ private String stockID;
 					} while (!valid);
 					//do sell trade
 					sellTrade(amountsell,stockShares,stockPrice.getClose());
-					redisplayTradeMenu();
+					return redisplayTradeMenu();
 				}
 			}
 			case 3: {//back
@@ -112,14 +113,14 @@ private String stockID;
 	private void sellTrade(int amountsell, SharesHolding stockShares, double stockPrice) {
 		//shares holding
 				//TODO CHECK how average price and profit are calculated
-				stockShares.updateSharesHolding(stockID, stockShares.getNumShares()-amountsell, stockShares.getAveragePrice(), stockShares.getTotalProfit()+((amountsell-stockShares.getAveragePrice())*stockPrice));
+				stockShares.updateSharesHolding(stockID, stockShares.getNumShares()-amountsell, stockShares.getAveragePrice(), stockShares.getTotalProfit()+((stockPrice-stockShares.getAveragePrice())*amountsell));
 				try {
 					TraderRecords.updateSharesHolding();
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 				}
 		//TradeRecord
-		TradeRecord buyTradeRecord = new TradeRecord(SetToday.getDate(), getStockID(), stockPrice, amountsell, 2);
+		TradeRecord buyTradeRecord = new TradeRecord(SetToday.getDate(), getStockID(), stockPrice, amountsell, 2,amountsell);
 		try {
 			TraderRecords.addTradeRecord(buyTradeRecord);
 		} catch (IOException e) {
@@ -149,18 +150,21 @@ private String stockID;
 		}
 		//trade record
 		// make a new trade record and add into file and reset array
-		TradeRecord buyTradeRecord = new TradeRecord(SetToday.getDate(), getStockID(), stockPrice, amountbuy, 1);
+		TradeRecord buyTradeRecord = new TradeRecord(SetToday.getDate(), getStockID(), stockPrice, amountbuy, 1,amountbuy);
 		try {
 			TraderRecords.addTradeRecord(buyTradeRecord);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 		}
+		
+		//TODO Delete later
+		System.out.println(TraderRecords.findTradeRecord(getStockID(), SetToday.getDate()).getStockID()+""+TraderRecords.findSharesHolding(getStockID()).getNumShares());
 	}
 
-	private void redisplayTradeMenu() {
+	private NavigationData redisplayTradeMenu() {
 		printMenu();
 		int optionIndex= getSelection();
-		performAction(optionIndex);
+		return performAction(optionIndex);
 	}
 
 	public String getStockID() {
