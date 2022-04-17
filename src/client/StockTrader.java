@@ -13,7 +13,7 @@ public class StockTrader {
 	public static void main(String[] args) throws FileNotFoundException {
 		StockData.loadData();
 		TraderRecords.loadRecords();
-		System.out.println();
+		System.out.println(TraderRecords.getTradeList()[0].getStockID());
 		SetToday.inputDate();
 		MenuController.startMenu();
 

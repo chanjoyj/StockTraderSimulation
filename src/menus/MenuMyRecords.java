@@ -17,8 +17,8 @@ public class MenuMyRecords extends Menu {
 		Screen.printAccInfo(accCash, overallProfit);
 		int optionNum;
 		SharesHolding[] holdingList = TraderRecords.getHoldingList();
-		if (!(holdingList == null)) {
-			for (int i = holdingList.length - 1; i < 0; i--) {
+		if (holdingList != null) {
+			for (int i = holdingList.length-1; i > -1; i--) {
 				Screen.printShareHoldingOption(holdingList.length - i, holdingList[i].getStockID(),
 						holdingList[i].getNumShares(), holdingList[i].getAveragePrice(),
 						holdingList[i].getTotalProfit());
@@ -45,7 +45,7 @@ public class MenuMyRecords extends Menu {
 			String selectedID = "";
 
 			// get stock ID of selected stock
-			for (int i = holdingList.length - 1; i < 0; i--) {
+			for (int i = holdingList.length - 1; i > -1; i--) {
 				if (optionIndex == holdingList.length - i) {
 					selectedID = holdingList[i].getStockID();
 					break;
@@ -200,6 +200,11 @@ public class MenuMyRecords extends Menu {
 					Screen.printSelectOption();
 					selection = Screen.keyboard.nextLine();
 				}
+				case "6":{
+					printMenu();
+					int op = getSelection();
+					return performAction(op);
+				}
 				}
 				option = holdingList.length;
 			} while (selection!="6");
@@ -235,7 +240,7 @@ public class MenuMyRecords extends Menu {
 							tradeRecords[i].getDirection(), tradeRecords[i].getPrice(), tradeRecords[i].getNumShares(),
 							tradeRecords[i].getPrice() * tradeRecords[i].getNumShares());
 				}
-			}
+			}else tradeRecords= new TradeRecord[0];
 			Screen.printOrderMenu();
 			Screen.printSelectOption();
 			String selection = Screen.keyboard.nextLine();
@@ -263,7 +268,7 @@ public class MenuMyRecords extends Menu {
 						}
 					}
 					tradeRecords = tradeRecords(startDate, endDate);
-					
+
 					Screen.printOrderMenu();
 					Screen.printSelectOption();
 					selection = Screen.keyboard.nextLine();
@@ -322,6 +327,7 @@ public class MenuMyRecords extends Menu {
 					Screen.printOrderMenu();
 					Screen.printSelectOption();
 					selection = Screen.keyboard.nextLine();
+					break;
 				}
 				case "4": {
 					// order by total num shares
@@ -348,7 +354,7 @@ public class MenuMyRecords extends Menu {
 					Screen.printOrderMenu();
 					Screen.printSelectOption();
 					selection = Screen.keyboard.nextLine();
-
+					break;
 				}
 				case "5": {
 					// Order by stock ID
@@ -375,11 +381,14 @@ public class MenuMyRecords extends Menu {
 					Screen.printOrderMenu();
 					Screen.printSelectOption();
 					selection = Screen.keyboard.nextLine();
+					break;
+				}case "6": {
+					printMenu();
+					int op = getSelection();
+					return performAction(op);
 				}
 				}
-				option = holdingList.length;
 			} while (selection!="6");
-			
 			if (selection == "6") {
 				printMenu();
 				int op = getSelection();
@@ -396,13 +405,14 @@ public class MenuMyRecords extends Menu {
 		TradeRecord[] tradeRecords = TraderRecords.getTradeList();
 		if (tradeRecords!=null) {
 			int count = 0;
-			for (int i = tradeRecords.length - 1; i < 0; i--) {
+			for (int i = tradeRecords.length - 1; i > -1; i--) {
 				if (stockID.equals(tradeRecords[i].getStockID())) {
 					count++;
 				}
 			}
 			TradeRecord[] selectedRecords = new TradeRecord[count];
-			for (int i = tradeRecords.length - 1; i < 0; i--) {
+			count=0;
+			for (int i = tradeRecords.length - 1; i > -1; i--) {
 				if (stockID.equals(tradeRecords[i].getStockID())) {
 					selectedRecords[count] = new TradeRecord(tradeRecords[i].getDate(), tradeRecords[i].getStockID(),
 							tradeRecords[i].getPrice(), tradeRecords[i].getNumShares(), tradeRecords[i].getDirection(),
@@ -411,8 +421,7 @@ public class MenuMyRecords extends Menu {
 				}
 			}
 			return selectedRecords;
-		}
-		return null;
+		}else return tradeRecords= new TradeRecord[0];
 	}
 
 	private TradeRecord[] tradeRecords(int startDate, int endDate) {
@@ -420,13 +429,13 @@ public class MenuMyRecords extends Menu {
 		TradeRecord[] tradeRecords = TraderRecords.getTradeList();
 		if (tradeRecords!=null) {
 			int count = 0;
-			for (int i = tradeRecords.length - 1; i < 0; i--) {
+			for (int i = tradeRecords.length - 1; i > -1; i--) {
 				if (tradeRecords[i].getDate() < endDate && tradeRecords[i].getDate() > startDate) {
 					count++;
 				}
 			}
 			TradeRecord[] selectedRecords = new TradeRecord[count];
-			for (int i = tradeRecords.length - 1; i < 0; i--) {
+			for (int i = tradeRecords.length - 1; i > -1; i--) {
 				if (tradeRecords[i].getDate() < endDate && tradeRecords[i].getDate() > startDate) {
 					selectedRecords[count] = new TradeRecord(tradeRecords[i].getDate(), tradeRecords[i].getStockID(),
 							tradeRecords[i].getPrice(), tradeRecords[i].getNumShares(), tradeRecords[i].getDirection(),
@@ -435,8 +444,7 @@ public class MenuMyRecords extends Menu {
 				}
 			}
 			return selectedRecords;
-		}
-		return null;
+		}else return tradeRecords= new TradeRecord[0];
 	}
 
 }
