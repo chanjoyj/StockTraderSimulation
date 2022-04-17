@@ -53,12 +53,13 @@ public class MenuMyRecords extends Menu {
 			}
 			// print all stocks in holding list = to the stockID selected
 			TradeRecord[] tradeRecords = tradeRecords(selectedID);
-			for (int i = 0; i < tradeRecords.length; i++) {
-				Screen.printTradeRecord(SetToday.revertDate(tradeRecords[i].getDate()), tradeRecords[i].getStockID(),
-						tradeRecords[i].getDirection(), tradeRecords[i].getPrice(), tradeRecords[i].getNumShares(),
-						tradeRecords[i].getPrice() * tradeRecords[i].getNumShares());
+			if (tradeRecords!=null) {
+				for (int i = 0; i < tradeRecords.length; i++) {
+					Screen.printTradeRecord(SetToday.revertDate(tradeRecords[i].getDate()), tradeRecords[i].getStockID(),
+							tradeRecords[i].getDirection(), tradeRecords[i].getPrice(), tradeRecords[i].getNumShares(),
+							tradeRecords[i].getPrice() * tradeRecords[i].getNumShares());
+				}
 			}
-
 			// print sorting menu
 			Screen.printOrderMenu();
 			Screen.printSelectOption();
@@ -228,6 +229,13 @@ public class MenuMyRecords extends Menu {
 			} while (endDate < startDate);
 			// print
 			TradeRecord[] tradeRecords = tradeRecords(startDate, endDate);
+			if (tradeRecords!=null) {
+				for (int i = 0; i < tradeRecords.length; i++) {
+					Screen.printTradeRecord(SetToday.revertDate(tradeRecords[i].getDate()), tradeRecords[i].getStockID(),
+							tradeRecords[i].getDirection(), tradeRecords[i].getPrice(), tradeRecords[i].getNumShares(),
+							tradeRecords[i].getPrice() * tradeRecords[i].getNumShares());
+				}
+			}
 			Screen.printOrderMenu();
 			Screen.printSelectOption();
 			String selection = Screen.keyboard.nextLine();
@@ -386,43 +394,49 @@ public class MenuMyRecords extends Menu {
 
 	private TradeRecord[] tradeRecords(String stockID) {
 		TradeRecord[] tradeRecords = TraderRecords.getTradeList();
-		int count = 0;
-		for (int i = tradeRecords.length - 1; i < 0; i--) {
-			if (stockID.equals(tradeRecords[i].getStockID())) {
-				count++;
+		if (tradeRecords!=null) {
+			int count = 0;
+			for (int i = tradeRecords.length - 1; i < 0; i--) {
+				if (stockID.equals(tradeRecords[i].getStockID())) {
+					count++;
+				}
 			}
-		}
-		TradeRecord[] selectedRecords = new TradeRecord[count];
-		for (int i = tradeRecords.length - 1; i < 0; i--) {
-			if (stockID.equals(tradeRecords[i].getStockID())) {
-				selectedRecords[count] = new TradeRecord(tradeRecords[i].getDate(), tradeRecords[i].getStockID(),
-						tradeRecords[i].getPrice(), tradeRecords[i].getNumShares(), tradeRecords[i].getDirection(),
-						tradeRecords[i].getTotalNumShares());
-				count++;
+			TradeRecord[] selectedRecords = new TradeRecord[count];
+			for (int i = tradeRecords.length - 1; i < 0; i--) {
+				if (stockID.equals(tradeRecords[i].getStockID())) {
+					selectedRecords[count] = new TradeRecord(tradeRecords[i].getDate(), tradeRecords[i].getStockID(),
+							tradeRecords[i].getPrice(), tradeRecords[i].getNumShares(), tradeRecords[i].getDirection(),
+							tradeRecords[i].getTotalNumShares());
+					count++;
+				}
 			}
+			return selectedRecords;
 		}
-		return selectedRecords;
+		return null;
 	}
 
 	private TradeRecord[] tradeRecords(int startDate, int endDate) {
 
 		TradeRecord[] tradeRecords = TraderRecords.getTradeList();
-		int count = 0;
-		for (int i = tradeRecords.length - 1; i < 0; i--) {
-			if (tradeRecords[i].getDate() < endDate && tradeRecords[i].getDate() > startDate) {
-				count++;
+		if (tradeRecords!=null) {
+			int count = 0;
+			for (int i = tradeRecords.length - 1; i < 0; i--) {
+				if (tradeRecords[i].getDate() < endDate && tradeRecords[i].getDate() > startDate) {
+					count++;
+				}
 			}
-		}
-		TradeRecord[] selectedRecords = new TradeRecord[count];
-		for (int i = tradeRecords.length - 1; i < 0; i--) {
-			if (tradeRecords[i].getDate() < endDate && tradeRecords[i].getDate() > startDate) {
-				selectedRecords[count] = new TradeRecord(tradeRecords[i].getDate(), tradeRecords[i].getStockID(),
-						tradeRecords[i].getPrice(), tradeRecords[i].getNumShares(), tradeRecords[i].getDirection(),
-						tradeRecords[i].getTotalNumShares());
-				count++;
+			TradeRecord[] selectedRecords = new TradeRecord[count];
+			for (int i = tradeRecords.length - 1; i < 0; i--) {
+				if (tradeRecords[i].getDate() < endDate && tradeRecords[i].getDate() > startDate) {
+					selectedRecords[count] = new TradeRecord(tradeRecords[i].getDate(), tradeRecords[i].getStockID(),
+							tradeRecords[i].getPrice(), tradeRecords[i].getNumShares(), tradeRecords[i].getDirection(),
+							tradeRecords[i].getTotalNumShares());
+					count++;
+				}
 			}
+			return selectedRecords;
 		}
-		return selectedRecords;
+		return null;
 	}
 
 }
