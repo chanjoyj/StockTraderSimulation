@@ -2,7 +2,7 @@ package menuController;
 
 public class NavigationData {
 	private int navTo;
-	private String stockID=null;
+	private String stockID = null;
 
 	public NavigationData(int n) {
 		navTo = n;

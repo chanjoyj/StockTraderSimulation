@@ -30,63 +30,11 @@ public class TraderRecords {
 				}
 				loadTradeData(tradeRecord);
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block for if file is not found
-			}
 
-			// get unique and set the total num shares
-			// get list of unique stockIDs
-			int[] stockIDList = new int[tradeList.length];
-			int[][] stockShares = new int[tradeList.length][2];
-			for (int i = 0; i < tradeList.length; i++) {
-				stockIDList[i] = Integer.parseInt(tradeList[i].getStockID());
-				stockShares[i][0] = Integer.parseInt(tradeList[i].getStockID());
-				stockShares[i][1] = tradeList[i].getNumShares();
 			}
-			Sorting.quickSort(stockIDList, 0, stockIDList.length - 1);
+			setTotalShares();
 
-			int prev = 0;
-			int count = 0;
-			for (int i = 0; i < stockIDList.length; i++) {
-				if (stockIDList[i] != prev) {
-					prev = stockIDList[i];
-					count++;
-				}
-			}
-
-			// create 2d array of unique ID and their total share count
-			int[][] uniqueStockShares = new int[count][2];
-			int[] totalShares = new int[count];
-			prev = 0;
-			count = 0;
-			int sharenum = 0;
-			for (int i = 0; i < stockIDList.length; i++) {
-				if (stockIDList[i] != prev) {
-					if (count != 0) {
-						uniqueStockShares[count - 1][1] = sharenum;
-						totalShares[count - 1] = sharenum;
-					}
-					prev = stockIDList[i];
-					uniqueStockShares[count][0] = stockIDList[i];
-					count++;
-					sharenum = 0;
-				}
-				for (int j = 0; j < stockIDList.length; j++) {
-					if (stockShares[j][0] == stockIDList[i]) {
-						sharenum += stockShares[j][1];
-						stockShares[j][0] = 0;
-					}
-				}
-			}
-
-			for (int j = 0; j < totalShares.length; j++) {
-				for (int i = 0; i < tradeList.length; i++) {
-					if (uniqueStockShares[j][0] == Integer.parseInt(tradeList[i].getStockID())) {
-						tradeList[i].setTotalNumShares(uniqueStockShares[j][1]);
-					}
-				}
-			}
 		}
-
 		if (sharesHolding.exists()) {
 			int numHolding;
 			try {
@@ -97,20 +45,94 @@ public class TraderRecords {
 				}
 				loadHoldingData(sharesHolding);
 			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block for if file is not found
+
 			}
 		}
 		setOverallProfit();
 		setCash();
 	}
 
+	private static void setTotalShares() {
+		TradeRecord[] tradeRecords = new TradeRecord[getTradeList().length];
+
+		for (int i = 0; i < getTradeList().length; i++) {
+			tradeRecords[i] = new TradeRecord();
+			tradeRecords[i].setDate(getTradeList()[i].getDate());
+			tradeRecords[i].setStockID(getTradeList()[i].getStockID());
+			tradeRecords[i].setPrice(getTradeList()[i].getPrice());
+			tradeRecords[i].setNumShares(getTradeList()[i].getNumShares());
+			tradeRecords[i].setDirection(getTradeList()[i].getDirection());
+			tradeRecords[i].setTotalNumShares(getTradeList()[i].getTotalNumShares());
+		}
+
+		int[] stockIDList = new int[tradeRecords.length];
+		int[][] stockShares = new int[tradeRecords.length][2];
+		for (int i = 0; i < tradeRecords.length; i++) {
+			stockIDList[i] = Integer.parseInt(tradeRecords[i].getStockID());
+			stockShares[i][0] = Integer.parseInt(tradeRecords[i].getStockID());
+			stockShares[i][1] = tradeRecords[i].getNumShares();
+		}
+		Sorting.quickSort(stockIDList, 0, stockIDList.length - 1);
+		int prev = 0;
+		int count = 0;
+		for (int i = 0; i < stockIDList.length; i++) {
+			if (stockIDList[i] != prev) {
+				prev = stockIDList[i];
+				count++;
+			}
+		}
+		// create 2d array of unique ID and their total share count
+		String[][] uniqueStockShares = new String[count][2];
+		int[] totalShares = new int[count];
+		prev = 0;
+		count = 0;
+		int sharenum = 0;
+
+		for (int i = 0; i < stockIDList.length; i++) {
+			if (stockIDList[i] != prev) {
+				if (count != 0) {
+					uniqueStockShares[count - 1][1] = sharenum + "";
+					totalShares[count - 1] = sharenum;
+				}
+				prev = stockIDList[i];
+				for (int j = 0; j < tradeRecords.length; j++) {
+					if (stockIDList[i] == Integer.parseInt(tradeRecords[j].getStockID())) {
+						uniqueStockShares[count][0] = tradeRecords[j].getStockID();
+						tradeRecords[j].setStockID("");
+						count++;
+						break;
+					}
+				}
+				sharenum = 0;
+			}
+			for (int j = 0; j < stockIDList.length; j++) {
+				if (stockShares[j][0] == stockIDList[i]) {
+					sharenum += stockShares[j][1];
+					stockShares[j][0] = 0;
+				}
+			}
+			if (i == stockIDList.length - 1) {
+				uniqueStockShares[count - 1][1] = sharenum + "";
+				totalShares[count - 1] = sharenum;
+			}
+		}
+		for (int j = 0; j < totalShares.length; j++) {
+			for (int i = 0; i < getTradeList().length; i++) {
+				if (uniqueStockShares[j][0].equals(getTradeList()[i].getStockID())) {
+					TraderRecords.tradeList[i].setTotalNumShares(Integer.parseInt(uniqueStockShares[j][1]));
+				}
+			}
+		}
+		getTradeList();
+	}
+
 	public static void resetRecords() {
-		if (tradeList!=null) {
-			setDividends(tradeList[tradeList.length-1].getDate(),SetToday.getDate());
+		if (tradeList != null) {
+			setDividends(tradeList[tradeList.length - 1].getDate(), SetToday.getDate());
 		}
 		setOverallProfit();
 		setCash();
-		
+
 	}
 
 	public static void setDividends(int fromDate, int toDate) {
@@ -120,15 +142,17 @@ public class TraderRecords {
 		int[][] dividendScore = new int[traderDividends.length][3];// for stockID, date bought, amount shares
 
 		for (int i = 0; i < traderDividends.length; i++) {// for each item in trader record
-			if (traderDividends[i].getDate()>=fromDate && traderDividends[i].getDate()<toDate) {
+			if (traderDividends[i].getDate() >= fromDate && traderDividends[i].getDate() < toDate) {
 				if (traderDividends[i].getDirection() == 1) {// if direction is buy
-					for (int j = 0; j < dividendScore.length; j++) {// if stock was bought before, change that record's date
+					for (int j = 0; j < dividendScore.length; j++) {// if stock was bought before, change that record's
+																	// date
 																	// bought and add to amount shares
 						if (dividendScore[j][0] == Integer.parseInt(traderDividends[i].getStockID())) {
 							dividendScore[j][1] = traderDividends[i].getDate();
 							dividendScore[j][2] += traderDividends[i].getNumShares();
 							break;
-						} else if (dividendScore[j][0] == 0) {// no stock record found, save the stock id, date bought and
+						} else if (dividendScore[j][0] == 0) {// no stock record found, save the stock id, date bought
+																// and
 																// add to amount shares held into new row in array
 							dividendScore[j][0] = Integer.parseInt(traderDividends[i].getStockID());
 							dividendScore[j][1] = traderDividends[i].getDate();
@@ -136,18 +160,21 @@ public class TraderRecords {
 							break;
 						}
 					}
-					for (int j = 0; j < traderDividends.length; j++) {// for loop over trader record for same stock ID and
+					for (int j = 0; j < traderDividends.length; j++) {// for loop over trader record for same stock ID
+																		// and
 																		// direction is sell
 						if (traderDividends[i].getStockID() == traderDividends[j].getStockID()
 								&& traderDividends[j].getDirection() == 2) {
 							for (int k = 0; k < dividendScore.length; k++) {// if stock was bought before, change that
-																			// record's date bought and add to amount shares
+																			// record's date bought and add to amount
+																			// shares
 								// loop through dividends to get the current one
 								if (dividendScore[k][0] == Integer.parseInt(traderDividends[j].getStockID())) {
 									if (dividendScore[k][2] == 0) {
 										break;
 									} else if (traderDividends[j].getNumShares() <= dividendScore[k][2]) {// if amount
-																											// sold<= amount
+																											// sold<=
+																											// amount
 																											// held
 										// subtract amount sold from amount shares held, keeping amountSold
 										dividendScore[k][2] = dividendScore[k][2] - traderDividends[j].getNumShares();
@@ -156,20 +183,24 @@ public class TraderRecords {
 										for (int p = 0; p < performanceList.length; p++) {
 											if (dividendScore[k][0] == Integer.parseInt(performanceList[p].getStockID())
 													&& performanceList[p].getPayableDate() > dividendScore[k][1]
-													&& performanceList[p].getPayableDate() < traderDividends[j].getDate()) {
-												// then add amount shares held * dividends as new dividends received, into
+													&& performanceList[p].getPayableDate() < traderDividends[j]
+															.getDate()) {
+												// then add amount shares held * dividends as new dividends received,
+												// into
 												// total profit for that shares holding
 												double dividendsProfit = traderDividends[j].getNumShares()
 														* performanceList[p].getDividend();
 												for (int l = 0; l < holdingList.length; l++) {
-													if (holdingList[l].getStockID() == performanceList[p].getStockID()) {
+													if (holdingList[l].getStockID() == performanceList[p]
+															.getStockID()) {
 														holdingList[l].setTotalProfit(
 																holdingList[l].getTotalProfit() + dividendsProfit);
 													}
 												}
 											}
 										}
-										traderDividends[j].setDirection(0);// also change the direction to 0 meaning sold
+										traderDividends[j].setDirection(0);// also change the direction to 0 meaning
+																			// sold
 																			// off previously already
 
 									} else if (traderDividends[j].getNumShares() > dividendScore[k][2]
@@ -183,13 +214,16 @@ public class TraderRecords {
 										for (int p = 0; p < performanceList.length; p++) {
 											if (dividendScore[k][0] == Integer.parseInt(performanceList[p].getStockID())
 													&& performanceList[p].getPayableDate() > dividendScore[k][1]
-													&& performanceList[p].getPayableDate() < traderDividends[j].getDate()) {
-												// then add amount shares held * dividends as new dividends received, into
+													&& performanceList[p].getPayableDate() < traderDividends[j]
+															.getDate()) {
+												// then add amount shares held * dividends as new dividends received,
+												// into
 												// total profit for that shares holding
 												double dividendsProfit = dividendScore[k][2]
 														* performanceList[p].getDividend();
 												for (int l = 0; l < holdingList.length; l++) {
-													if (holdingList[l].getStockID() == performanceList[p].getStockID()) {
+													if (holdingList[l].getStockID() == performanceList[p]
+															.getStockID()) {
 														holdingList[l].setTotalProfit(
 																holdingList[l].getTotalProfit() + dividendsProfit);
 													}
@@ -207,8 +241,10 @@ public class TraderRecords {
 			} // end reading trade record
 		}
 		for (int j = 0; j < dividendScore.length; j++) { // stockID, date bought, amount shares
-			if (dividendScore[j][2] > 0) {// for loop in array for all stocks where amount held is > 0 (shares still holidng)
-				// for loop over performance if stockID equal && payable date within (excluding) date bought and today,
+			if (dividendScore[j][2] > 0) {// for loop in array for all stocks where amount held is > 0 (shares still
+											// holidng)
+				// for loop over performance if stockID equal && payable date within (excluding)
+				// date bought and today,
 				for (int p = 0; p < performanceList.length; p++) {
 					if (dividendScore[j][0] == Integer.parseInt(performanceList[p].getStockID())
 							&& performanceList[p].getPayableDate() > dividendScore[j][1]
@@ -242,7 +278,6 @@ public class TraderRecords {
 			index++;
 		}
 		FileReader.close();
-
 	}
 
 	private static void loadHoldingData(File Data) throws FileNotFoundException {
@@ -265,13 +300,13 @@ public class TraderRecords {
 	}
 
 	public static void setCash() {
-		double cash = 1000000.00;// TODO Try one with 0 cash
+		double cash = 1000000.00;
 		if (!(tradeList == null)) {
 			for (int i = 0; i < tradeList.length; i++) {
 				if (tradeList[i].getDirection() == 1) {
-					cash = cash - tradeList[i].getPrice();
+					cash = cash - tradeList[i].getPrice() * tradeList[i].getNumShares();
 				} else if (tradeList[i].getDirection() == 2) {
-					cash = cash + tradeList[i].getPrice();
+					cash = cash + tradeList[i].getPrice() * tradeList[i].getNumShares();
 				}
 			}
 			for (int i = 0; i < holdingList.length; i++) {
@@ -315,10 +350,10 @@ public class TraderRecords {
 	}
 
 	public static TradeRecord findLastTradeRecord(String ID) {
-		if (!(tradeList == null)) {
-			for (int i = tradeList.length - 1; i < 0; i--) {
-				if (ID.equals(tradeList[i].getStockID())) {
-					return tradeList[i];
+		if (getTradeList() != null) {
+			for (int i = getTradeList().length - 1; i > -1; i--) {
+				if (ID.equals(getTradeList()[i].getStockID())) {
+					return getTradeList()[i];
 				}
 			}
 		}
@@ -336,7 +371,7 @@ public class TraderRecords {
 		return null;
 	}
 
-	public static void addTradeRecord(TradeRecord record) throws IOException {// TODO do we need to deal with this exception?
+	public static void addTradeRecord(TradeRecord record) throws IOException {
 		File tradeRecord = new File("trade-record.csv");
 		FileWriter outputFile = new FileWriter(tradeRecord, true);// appends
 		outputFile.write(SetToday.revertDate(record.getDate()) + "," + record.getStockID() + "," + record.getPrice()

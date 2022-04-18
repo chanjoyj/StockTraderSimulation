@@ -14,6 +14,7 @@ public class TradeRecord {
 		this.price = price;
 		this.numShares = numShares;
 		this.direction = direction;
+		this.totalNumShares = totalNumShares;
 	}
 
 	public TradeRecord() {

@@ -8,8 +8,7 @@ public class StockPerformance {
 	private double dividend;
 	private int payableDate;
 
-	public StockPerformance(String stockID, int date, double profit, double nAV, double dividend,
-			int payableDate) {
+	public StockPerformance(String stockID, int date, double profit, double nAV, double dividend, int payableDate) {
 		this.stockID = stockID;
 		this.date = date;
 		this.profit = profit;

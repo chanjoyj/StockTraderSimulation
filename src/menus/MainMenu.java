@@ -114,8 +114,6 @@ public class MainMenu extends Menu {
 				count++;
 			}
 		}
-		// TODO Delete later
-		System.out.println("autodatelist from to " + SetToday.getDate() + " " + endDate);
 
 		for (int i = 0; i < autoDateList.length; i++) {
 			SetToday.setDate(autoDateList[i]);
@@ -123,18 +121,24 @@ public class MainMenu extends Menu {
 			TradeRecord lastTrade = TraderRecords.findLastTradeRecord(stockID);
 			SharesHolding stockShares = TraderRecords.findSharesHolding(stockID);
 			if (!(lastTrade == null)) {
-				if (dailyPrice.getClose() < lastTrade.getPrice() && !(stockShares == null)) {
+				if (dailyPrice.getClose() < lastTrade.getPrice() && stockShares != null
+						&& stockShares.getNumShares() != 0) {
 					sellTrade(stockShares.getNumShares(), stockShares, dailyPrice.getClose());
 					Screen.printAutoTradeMsg(SetToday.revertDate(SetToday.getDate()), stockID, 2, dailyPrice.getClose(),
 							stockShares.getNumShares(), dailyPrice.getClose() * stockShares.getNumShares());
+					// to see
+					stockShares.getNumShares();
+					TraderRecords.getCash();
 
-				} else if (dailyPrice.getClose() < lastTrade.getPrice()
+				} else if (dailyPrice.getClose() > lastTrade.getPrice()
 						&& TraderRecords.getCash() > dailyPrice.getClose()) {
 					double numPossible = TraderRecords.getCash() / dailyPrice.getClose();
 					int max = Integer.parseInt(("" + numPossible).substring(0, ("" + numPossible).indexOf(".")));
 					buyTrade(max, dailyPrice.getClose());
 					Screen.printAutoTradeMsg(SetToday.revertDate(SetToday.getDate()), stockID, 1, dailyPrice.getClose(),
 							max, dailyPrice.getClose() * max);
+					// to see
+					TraderRecords.getCash();
 				}
 			}
 		}
@@ -144,13 +148,13 @@ public class MainMenu extends Menu {
 	private void sellTrade(int amountsell, SharesHolding stockShares, double stockPrice) {
 		// shares holding
 		String stockID = "00700";
-		// TODO CHECK how average price and profit are calculated
+
 		stockShares.updateSharesHolding(stockID, stockShares.getNumShares() - amountsell, stockShares.getAveragePrice(),
-				stockShares.getTotalProfit() + ((amountsell - stockShares.getAveragePrice()) * stockPrice));
+				stockShares.getTotalProfit() + (amountsell * stockPrice));
 		try {
 			TraderRecords.updateSharesHolding();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 		}
 
 		// TradeRecord
@@ -159,8 +163,7 @@ public class MainMenu extends Menu {
 		try {
 			TraderRecords.addTradeRecord(buyTradeRecord);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
 		}
 	}
 
@@ -174,7 +177,7 @@ public class MainMenu extends Menu {
 			try {
 				TraderRecords.addSharesHolding(newSharesHolding);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+
 			}
 		} else {
 			existingSharesHolding.updateSharesHolding(stockID, existingSharesHolding.getNumShares() + amountbuy,
@@ -182,7 +185,7 @@ public class MainMenu extends Menu {
 			try {
 				TraderRecords.updateSharesHolding();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
+
 			}
 		}
 		// trade record
@@ -191,7 +194,7 @@ public class MainMenu extends Menu {
 		try {
 			TraderRecords.addTradeRecord(buyTradeRecord);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 		}
 	}
 }

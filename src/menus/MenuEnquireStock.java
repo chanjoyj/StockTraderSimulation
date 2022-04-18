@@ -22,7 +22,7 @@ public class MenuEnquireStock extends Menu {
 		// print stock and current price
 		DailyPrice stockPrice = StockData.findDailyPrice(stockID, SetToday.getDate());
 		// prints sub menu
-		int optionNum=0;
+		int optionNum = 0;
 		if (stock.getType() == 1) {// listed print Latest net profit, net asset value and last dividend.
 			StockPerformance stockPerformance = StockData.findPerformance(stockID, SetToday.getDate());
 			Screen.printListedCompanyInfo(stockID, stockPrice.getClose(), stockPerformance.getProfit(),
@@ -50,22 +50,22 @@ public class MenuEnquireStock extends Menu {
 
 	public NavigationData performAction(int optionIndex) {
 		Stock stock = StockData.findStockbyID(getStockID());
-		int options=0;
+		int options = 0;
 		if (stock.getType() == 2) {
 			options = stock.getETFstocks().length;
 		} else
 			options = 0;
-		//ETF
-		if (optionIndex < options + 1) {//assuming user inputs are valid not <=0
+		// ETF
+		if (optionIndex < options + 1) {// assuming user inputs are valid not <=0
 			for (int i = 0; i < stock.getETFstocks().length; i++) {
 				if (optionIndex == i + 1) {
 					return new NavigationData(ConstantFlags.NAV_ENQUIRE, stock.getETFstocks()[i].getStockID());
 				}
 			}
-		//Trade
-		}else if (optionIndex == options + 1) {
+			// Trade
+		} else if (optionIndex == options + 1) {
 			return new NavigationData(ConstantFlags.NAV_TRADE, stock.getStockID());
-		//Enquire
+			// Enquire
 		} else if (optionIndex == options + 2) {
 			int startDate;
 			int endDate;
@@ -88,7 +88,7 @@ public class MenuEnquireStock extends Menu {
 			printMenu();
 			int option = getSelection();
 			return performAction(option);
-		// back
+			// back
 		} else if (optionIndex == options + 3) {
 			return new NavigationData(ConstantFlags.NAV_BACK);
 		}
